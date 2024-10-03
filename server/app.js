@@ -4,8 +4,12 @@ const app = express();
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/DictionaryApp');
 
+const cors = require('cors');
+app.use(cors());
+app.use(express.json());
+
 const Word = require('./models/word')
-app.get('/',async(req,res)=>{
+app.post('/dictionary',async(req,res)=>{
     const {name}=req.body;
     //want to find the word coming from client will exists in mongodb or not
     const newword = await Word.find({name : name});
@@ -25,9 +29,12 @@ app.get('/',async(req,res)=>{
             }
          )
         const data = await response.json();
+        // if(!response.ok){
+        //     res.status(500).json({message : "response was not good from api"})
+        // }
         await Word.create({name : name , data :data})
         res.status(200).json({message : 'the word is fetched from oxford api' , data : data})
-       }
+       }//{name : name , data :data}
        catch(err){
         console.error(err),
         res.status(500).json({message : err.message})
